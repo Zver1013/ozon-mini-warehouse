@@ -9,24 +9,24 @@ class Item(BaseModel):
     quantity: int
 
 @app.post("/items", status_code=201)
-def create_item(item: Item):
+async def create_item(item: Item):
     if item.name in items:
         raise HTTPException(status_code=409, detail="Item already exists")
     items[item.name] = item.quantity
     return {"status": "created", "item": item}
 
 @app.get("/items")
-def list_items():
+async def list_items():
     return items
 
 @app.get("/items/{name}")
-def get_item(name: str):
+async def get_item(name: str):
     if name not in items:
         raise HTTPException(status_code=404, detail="Not found")
     return {"name": name, "quantity": items[name]}
 
 @app.put("/items/{name}")
-def update_item(name: str, item: Item):
+async def update_item(name: str, item: Item):
     if name not in items:
         raise HTTPException(status_code=404, detail="Not found")
     # allow renaming? for простоты — overwrite quantity only
@@ -34,7 +34,7 @@ def update_item(name: str, item: Item):
     return {"status": "updated", "item": {"name": name, "quantity": items[name]}}
 
 @app.delete("/items/{name}", status_code=204)
-def delete_item(name: str):
+async def delete_item(name: str):
     if name not in items:
         raise HTTPException(status_code=404, detail="Not found")
     del items[name]
